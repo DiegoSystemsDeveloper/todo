@@ -1,24 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import Formulario from "./components/Formulario";
+import Task from "./components/Task";
+import React, { useState, useEffect } from 'react'
 
 function App() {
+
+  let initialTasks = JSON.parse(localStorage.getItem('tasks'));
+  if (!initialTasks) {
+    initialTasks = [];
+  }
+
+  const [tasks, setTasks] = useState(initialTasks)
+
+  useEffect(() => {
+    let initialTasks = JSON.parse(localStorage.getItem('tasks'));
+
+    if (initialTasks) {
+      localStorage.setItem('tasks', JSON.stringify(tasks))
+    } else {
+      localStorage.setItem('tasks', JSON.stringify([]));
+    }
+  }, [tasks]);
+
+  const addTask = task => {
+    setTasks([...tasks, task])
+  }
+
+  const deleteTask = id => {
+    const newTasks = tasks.filter(task => task.id !== id)
+    setTasks(newTasks)
+  }
+
+  const updateTask = id => {
+    tasks.forEach(task => {
+      if (task.id === id) {
+        task.isTasty = !task.isTasty
+      }
+    });
+    setTasks(tasks)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="container mx-auto mt-3 text-center">
+        <h1 className="">TO DO</h1>
+        <Formulario
+          addTask={addTask}
+        />
+        <div>
+          {tasks.length === 0 ? <h3>Add your Task</h3> :
+            tasks.map((task) => (
+              <Task
+                key={task.id}
+                task={task}
+                deleteTask={deleteTask}
+                updateTask={updateTask}
+              />
+            ))}
+        </div>
+      </div>
+    </>
   );
 }
 
